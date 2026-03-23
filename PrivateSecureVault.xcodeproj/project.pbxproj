@@ -1,0 +1,262 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		C0FFEE010000000000000001 /* PrivateSecureVaultApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0FFEE020000000000000001 /* PrivateSecureVaultApp.swift */; };
+		C0FFEE010000000000000002 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0FFEE020000000000000002 /* ContentView.swift */; };
+		C0FFEE010000000000000003 /* VaultCrypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0FFEE020000000000000003 /* VaultCrypto.swift */; };
+		C0FFEE010000000000000004 /* VaultStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0FFEE020000000000000004 /* VaultStore.swift */; };
+		C0FFEE010000000000000005 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C0FFEE020000000000000005 /* Assets.xcassets */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		C0FFEE030000000000000001 /* PrivateSecureVault.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PrivateSecureVault.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C0FFEE020000000000000001 /* PrivateSecureVaultApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivateSecureVaultApp.swift; sourceTree = "<group>"; };
+		C0FFEE020000000000000002 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		C0FFEE020000000000000003 /* VaultCrypto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VaultCrypto.swift; sourceTree = "<group>"; };
+		C0FFEE020000000000000004 /* VaultStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VaultStore.swift; sourceTree = "<group>"; };
+		C0FFEE020000000000000005 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		C0FFEE020000000000000006 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		C0FFEE040000000000000001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		C0FFEE050000000000000001 = {
+			isa = PBXGroup;
+			children = (
+				C0FFEE050000000000000002 /* Root */,
+				C0FFEE050000000000000003 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		C0FFEE050000000000000002 /* Root */ = {
+			isa = PBXGroup;
+			children = (
+				C0FFEE020000000000000001 /* PrivateSecureVaultApp.swift */,
+				C0FFEE020000000000000002 /* ContentView.swift */,
+				C0FFEE020000000000000003 /* VaultCrypto.swift */,
+				C0FFEE020000000000000004 /* VaultStore.swift */,
+				C0FFEE020000000000000005 /* Assets.xcassets */,
+				C0FFEE020000000000000006 /* Info.plist */,
+			);
+			name = Root;
+			sourceTree = "<group>";
+		};
+		C0FFEE050000000000000003 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				C0FFEE030000000000000001 /* PrivateSecureVault.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		C0FFEE060000000000000001 /* PrivateSecureVault */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C0FFEE090000000000000001 /* Build configuration list for PBXNativeTarget "PrivateSecureVault" */;
+			buildPhases = (
+				C0FFEE070000000000000001 /* Sources */,
+				C0FFEE040000000000000001 /* Frameworks */,
+				C0FFEE070000000000000002 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = PrivateSecureVault;
+			productName = PrivateSecureVault;
+			productReference = C0FFEE030000000000000001 /* PrivateSecureVault.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		C0FFEE080000000000000001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1500;
+				LastUpgradeCheck = 1500;
+				TargetAttributes = {
+					C0FFEE060000000000000001 = {
+						CreatedOnToolsVersion = 15.0;
+					};
+				};
+			};
+			buildConfigurationList = C0FFEE090000000000000002 /* Build configuration list for PBXProject "PrivateSecureVault" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = C0FFEE050000000000000001;
+			productRefGroup = C0FFEE050000000000000003 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				C0FFEE060000000000000001 /* PrivateSecureVault */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		C0FFEE070000000000000002 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C0FFEE010000000000000005 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		C0FFEE070000000000000001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C0FFEE010000000000000001 /* PrivateSecureVaultApp.swift in Sources */,
+				C0FFEE010000000000000002 /* ContentView.swift in Sources */,
+				C0FFEE010000000000000003 /* VaultCrypto.swift in Sources */,
+				C0FFEE010000000000000004 /* VaultStore.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		C0FFEE0A0000000000000001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		C0FFEE0A0000000000000002 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_OPTIMIZATION_LEVEL = s;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		C0FFEE0B0000000000000001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.privatevault.PrivateSecureVault;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		C0FFEE0B0000000000000002 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.privatevault.PrivateSecureVault;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		C0FFEE090000000000000001 /* Build configuration list for PBXNativeTarget "PrivateSecureVault" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C0FFEE0B0000000000000001 /* Debug */,
+				C0FFEE0B0000000000000002 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C0FFEE090000000000000002 /* Build configuration list for PBXProject "PrivateSecureVault" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C0FFEE0A0000000000000001 /* Debug */,
+				C0FFEE0A0000000000000002 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = C0FFEE080000000000000001 /* Project object */;
+}
