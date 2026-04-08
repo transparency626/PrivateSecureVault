@@ -1,13 +1,6 @@
+import CryptoKit
 import SwiftUI
-
-/// 纯视觉雏形：占位「已导入的加密文件」，无业务逻辑。
-private let prototypeFileTitles = [
-    "季度报告.pdf",
-    "扫描件_2024.png",
-    "合同草案.docx",
-    "备忘录.txt",
-    "旅行照片.heic",
-]
+import UniformTypeIdentifiers
 
 struct ContentView: View {
     private let columns = [
@@ -16,6 +9,17 @@ struct ContentView: View {
         GridItem(.flexible(), spacing: 16),
         GridItem(.flexible(), spacing: 16),
     ]
+
+    @State private var rows: [(UUID, String)] = []
+    @State private var pick = false
+    @State private var askPass = false
+    @State private var password = ""
+    @State private var pickedURL: URL?
+
+    private var vaultRoot: URL {
+        FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+            .appendingPathComponent("vault", isDirectory: true)
+    }
 
     var body: some View {
         NavigationStack {
@@ -27,8 +31,8 @@ struct ContentView: View {
                             .padding(.horizontal, 4)
 
                         LazyVGrid(columns: columns, spacing: 20) {
-                            ForEach(prototypeFileTitles, id: \.self) { title in
-                                fileCell(title: title)
+                            ForEach(rows, id: \.0) { _, name in
+                                fileCell(title: name)
                             }
                         }
                         .padding(.top, 4)
@@ -38,13 +42,70 @@ struct ContentView: View {
                     .padding(.bottom, 100)
                 }
 
-                selectFileButton
-                    .padding(.trailing, 20)
-                    .padding(.bottom, 28)
+                Button {
+                    pick = true
+                } label: {
+                    Label("选择文件", systemImage: "folder.badge.plus")
+                        .font(.subheadline.weight(.semibold))
+                        .padding(.horizontal, 18)
+                        .padding(.vertical, 12)
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(.blue)
+                .clipShape(Capsule())
+                .shadow(color: .black.opacity(0.18), radius: 10, y: 4)
+                .padding(.trailing, 20)
+                .padding(.bottom, 28)
             }
             .navigationTitle("加密保险箱")
             .navigationBarTitleDisplayMode(.large)
             .background(Color(.systemGroupedBackground))
+            .fileImporter(isPresented: $pick, allowedContentTypes: [UTType.item], allowsMultipleSelection: false) { r in
+                guard case .success(let urls) = r, let u = urls.first else { return }
+                _ = u.startAccessingSecurityScopedResource()
+                pickedURL = u
+                askPass = true
+            }
+            .alert("输入密码", isPresented: $askPass) {
+                SecureField("密码", text: $password)
+                Button("加密并保存") {
+                    guard let url = pickedURL else { return }
+                    defer {
+                        url.stopAccessingSecurityScopedResource()
+                        pickedURL = nil
+                        password = ""
+                    }
+                    guard !password.isEmpty, let plain = try? Data(contentsOf: url) else { return }
+                    let salt = Data((0..<16).map { _ in UInt8.random(in: 0...255) })
+                    let key = SymmetricKey(data: Data(SHA256.hash(data: Data(password.utf8) + salt)))
+                    guard let sealed = try? AES.GCM.seal(plain, using: key), let combined = sealed.combined else { return }
+                    let blob = salt + combined
+                    let id = UUID()
+                    try? FileManager.default.createDirectory(at: vaultRoot, withIntermediateDirectories: true)
+                    try? blob.write(to: vaultRoot.appendingPathComponent("\(id.uuidString).bin"))
+                    rows.append((id, url.lastPathComponent))
+                    let idx = rows.map { ["id": $0.0.uuidString, "name": $0.1] }
+                    if let j = try? JSONSerialization.data(withJSONObject: idx) {
+                        try? j.write(to: vaultRoot.appendingPathComponent("index.json"))
+                    }
+                }
+                Button("取消", role: .cancel) {
+                    pickedURL?.stopAccessingSecurityScopedResource()
+                    pickedURL = nil
+                    password = ""
+                }
+            } message: {
+                Text("用于加密所选文件")
+            }
+            .onAppear {
+                let p = vaultRoot.appendingPathComponent("index.json")
+                guard let d = try? Data(contentsOf: p),
+                      let a = try? JSONSerialization.jsonObject(with: d) as? [[String: String]] else { return }
+                rows = a.compactMap { g in
+                    guard let s = g["id"], let u = UUID(uuidString: s), let n = g["name"] else { return nil }
+                    return (u, n)
+                }
+            }
         }
     }
 
@@ -67,19 +128,6 @@ struct ContentView: View {
                 .multilineTextAlignment(.center)
                 .frame(maxWidth: .infinity)
         }
-    }
-
-    private var selectFileButton: some View {
-        Button(action: {}) {
-            Label("选择文件", systemImage: "folder.badge.plus")
-                .font(.subheadline.weight(.semibold))
-                .padding(.horizontal, 18)
-                .padding(.vertical, 12)
-        }
-        .buttonStyle(.borderedProminent)
-        .tint(.blue)
-        .clipShape(Capsule())
-        .shadow(color: .black.opacity(0.18), radius: 10, y: 4)
     }
 }
 
