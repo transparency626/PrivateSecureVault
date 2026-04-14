@@ -1,6 +1,7 @@
 import CryptoKit
 import SwiftUI
 import UniformTypeIdentifiers
+import UIKit
 
 struct ContentView: View {
     private let columns = [
@@ -25,6 +26,8 @@ struct ContentView: View {
     @State private var showContentSheet = false
     @State private var sheetBytes = Data()
     @State private var sheetFileName = ""
+    @State private var showShareSheet = false
+    @State private var shareItems: [Any] = []
 
     private var vaultRoot: URL {
         FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
@@ -123,23 +126,27 @@ struct ContentView: View {
                 SecureField("密码", text: $encryptPassword)
                 Button("加密并保存") {
                     guard let url = fileURLForEncrypt else { return }
-                    defer {
-                        url.stopAccessingSecurityScopedResource()
-                        fileURLForEncrypt = nil
-                        encryptPassword = ""
-                    }
-                    guard !encryptPassword.isEmpty, let plain = try? Data(contentsOf: url) else { return }
-                    let salt = Data((0..<16).map { _ in UInt8.random(in: 0...255) })
-                    let key = SymmetricKey(data: Data(SHA256.hash(data: Data(encryptPassword.utf8) + salt)))
-                    guard let sealed = try? AES.GCM.seal(plain, using: key), let combined = sealed.combined else { return }
-                    let blob = salt + combined
-                    let id = UUID()
-                    try? FileManager.default.createDirectory(at: vaultRoot, withIntermediateDirectories: true)
-                    try? blob.write(to: vaultRoot.appendingPathComponent("\(id.uuidString).bin"))
-                    encryptedFileEntries.append((id, url.lastPathComponent))
-                    let idx = encryptedFileEntries.map { ["id": $0.0.uuidString, "name": $0.1] }
-                    if let j = try? JSONSerialization.data(withJSONObject: idx) {
-                        try? j.write(to: vaultRoot.appendingPathComponent("index.json"))
+                    let password = encryptPassword
+                    guard !password.isEmpty else { return }
+                    encryptPassword = ""
+                    fileURLForEncrypt = nil
+                    DispatchQueue.global(qos: .userInitiated).async {
+                        defer { url.stopAccessingSecurityScopedResource() }
+                        guard let plain = try? Data(contentsOf: url) else { return }
+                        let salt = Data((0..<16).map { _ in UInt8.random(in: 0...255) })
+                        let key = SymmetricKey(data: Data(SHA256.hash(data: Data(password.utf8) + salt)))
+                        guard let sealed = try? AES.GCM.seal(plain, using: key),
+                              let combined = sealed.combined else { return }
+                        let blob = salt + combined
+                        let id = UUID()
+                        do {
+                            try FileManager.default.createDirectory(at: vaultRoot, withIntermediateDirectories: true)
+                            try blob.write(to: vaultRoot.appendingPathComponent("\(id.uuidString).bin"))
+                        } catch { return }
+                        DispatchQueue.main.async {
+                            encryptedFileEntries.append((id, url.lastPathComponent))
+                            saveIndex()
+                        }
                     }
                 }
                 Button("取消", role: .cancel) {
@@ -154,17 +161,24 @@ struct ContentView: View {
                 SecureField("密码", text: $decryptPassword)
                 Button("解密") {
                     guard let id = pendingDecryptId else { return }
-                    let path = vaultRoot.appendingPathComponent("\(id.uuidString).bin")
-                    guard let blob = try? Data(contentsOf: path), blob.count > 16 else { return }
-                    let salt = blob.prefix(16)
-                    let key = SymmetricKey(data: Data(SHA256.hash(data: Data(decryptPassword.utf8) + Data(salt))))
-                    guard let box = try? AES.GCM.SealedBox(combined: Data(blob.dropFirst(16))),
-                    let plain = try? AES.GCM.open(box, using: key) else { return }
-                    sheetBytes = plain
-                    sheetFileName = pendingDecryptName
+                    let pendingName = pendingDecryptName
+                    let password = decryptPassword
+                    guard !password.isEmpty else { return }
                     decryptPassword = ""
                     pendingDecryptId = nil
-                    showContentSheet = true
+                    DispatchQueue.global(qos: .userInitiated).async {
+                        let path = vaultRoot.appendingPathComponent("\(id.uuidString).bin")
+                        guard let blob = try? Data(contentsOf: path), blob.count > 16 else { return }
+                        let salt = blob.prefix(16)
+                        let key = SymmetricKey(data: Data(SHA256.hash(data: Data(password.utf8) + Data(salt))))
+                        guard let box = try? AES.GCM.SealedBox(combined: Data(blob.dropFirst(16))),
+                              let plain = try? AES.GCM.open(box, using: key) else { return }
+                        let outputURL = decryptedOutputURL(fileName: pendingName)
+                        guard (try? plain.write(to: outputURL, options: .atomic)) != nil else { return }
+                        DispatchQueue.main.async {
+                            presentShare(outputURL)
+                        }
+                    }
                 }
                 Button("取消", role: .cancel) {
                     pendingDecryptId = nil
@@ -193,6 +207,9 @@ struct ContentView: View {
                 .toolbar { ToolbarItem(placement: .cancellationAction) { Button("关闭") { showContentSheet = false } } }
             }
         }
+        .sheet(isPresented: $showShareSheet) {
+            ShareSheet(items: shareItems)
+        }
     }
 
     private func fileCell(title: String) -> some View {
@@ -215,6 +232,35 @@ struct ContentView: View {
                 .frame(maxWidth: .infinity)
         }
     }
+
+    private func saveIndex() {
+        let idx = encryptedFileEntries.map { ["id": $0.0.uuidString, "name": $0.1] }
+        guard let j = try? JSONSerialization.data(withJSONObject: idx) else { return }
+        try? j.write(to: vaultRoot.appendingPathComponent("index.json"))
+    }
+
+    private func decryptedOutputURL(fileName: String) -> URL {
+        let ext = URL(fileURLWithPath: fileName).pathExtension
+        let base = URL(fileURLWithPath: fileName).deletingPathExtension().lastPathComponent
+        let name = ext.isEmpty ? "\(base)-decrypted" : "\(base)-decrypted.\(ext)"
+        let dir = FileManager.default.temporaryDirectory
+        return dir.appendingPathComponent(name)
+    }
+
+    private func presentShare(_ url: URL) {
+        shareItems = [url]
+        showShareSheet = true
+    }
 }
 
 #Preview { ContentView() }
+
+struct ShareSheet: UIViewControllerRepresentable {
+    let items: [Any]
+
+    func makeUIViewController(context: Context) -> UIActivityViewController {
+        UIActivityViewController(activityItems: items, applicationActivities: nil)
+    }
+
+    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
+}
