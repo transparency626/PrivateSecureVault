@@ -17,6 +17,11 @@ struct ContentView: View {
     @State private var encryptPassword = ""
     @State private var fileURLForEncrypt: URL?
     @State private var waitingToPickFileToView = false
+    @State private var waitingToPickFileToDecrypt = false
+    @State private var showDecryptPasswordAlert = false
+    @State private var decryptPassword = ""
+    @State private var pendingDecryptId: UUID?
+    @State private var pendingDecryptName = ""
     @State private var showContentSheet = false
     @State private var sheetBytes = Data()
     @State private var sheetFileName = ""
@@ -31,18 +36,27 @@ struct ContentView: View {
             ZStack(alignment: .bottomTrailing) {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 12) {
-                        Text(waitingToPickFileToView ? "请选择要查看的文件" : "加密文件")
+                        Text(
+                            waitingToPickFileToDecrypt ? "请选择要解密的文件" :
+                                waitingToPickFileToView ? "请选择要查看的文件" : "加密文件"
+                        )
                             .font(.title2.weight(.semibold))
                             .padding(.horizontal, 4)
 
                         LazyVGrid(columns: columns, spacing: 20) {
                             ForEach(encryptedFileEntries, id: \.0) { id, name in
                                 Button {
-                                    guard waitingToPickFileToView else { return }
-                                    sheetBytes = (try? Data(contentsOf: vaultRoot.appendingPathComponent("\(id.uuidString).bin"))) ?? Data()
-                                    sheetFileName = name
-                                    showContentSheet = true
-                                    waitingToPickFileToView = false
+                                    if waitingToPickFileToView {
+                                        sheetBytes = (try? Data(contentsOf: vaultRoot.appendingPathComponent("\(id.uuidString).bin"))) ?? Data()
+                                        sheetFileName = name
+                                        showContentSheet = true
+                                        waitingToPickFileToView = false
+                                    } else if waitingToPickFileToDecrypt {
+                                        pendingDecryptId = id
+                                        pendingDecryptName = name
+                                        waitingToPickFileToDecrypt = false
+                                        showDecryptPasswordAlert = true
+                                    }
                                 } label: {
                                     fileCell(title: name)
                                 }
@@ -53,12 +67,13 @@ struct ContentView: View {
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.horizontal, 16)
-                    .padding(.bottom, 160)
+                    .padding(.bottom, 200)
                 }
 
                 VStack(alignment: .trailing, spacing: 10) {
                     Button {
                         waitingToPickFileToView = true
+                        waitingToPickFileToDecrypt = false
                     } label: {
                         Label("查看加密文件", systemImage: "eye.fill")
                             .font(.subheadline.weight(.semibold))
@@ -66,6 +81,18 @@ struct ContentView: View {
                             .padding(.vertical, 10)
                     }
                     .buttonStyle(.bordered)
+
+                    Button {
+                        waitingToPickFileToDecrypt = true
+                        waitingToPickFileToView = false
+                    } label: {
+                        Label("解密文件", systemImage: "lock.open.fill")
+                            .font(.subheadline.weight(.semibold))
+                            .padding(.horizontal, 14)
+                            .padding(.vertical, 10)
+                    }
+                    .buttonStyle(.bordered)
+                    .tint(.orange)
 
                     Button {
                         showFileSelector = true
@@ -122,6 +149,29 @@ struct ContentView: View {
                 }
             } message: {
                 Text("用于加密所选文件")
+            }
+            .alert("解密密码", isPresented: $showDecryptPasswordAlert) {
+                SecureField("密码", text: $decryptPassword)
+                Button("解密") {
+                    guard let id = pendingDecryptId else { return }
+                    let path = vaultRoot.appendingPathComponent("\(id.uuidString).bin")
+                    guard let blob = try? Data(contentsOf: path), blob.count > 16 else { return }
+                    let salt = blob.prefix(16)
+                    let key = SymmetricKey(data: Data(SHA256.hash(data: Data(decryptPassword.utf8) + Data(salt))))
+                    guard let box = try? AES.GCM.SealedBox(combined: Data(blob.dropFirst(16))),
+                          let plain = try? AES.GCM.open(box, using: key) else { return }
+                    sheetBytes = plain
+                    sheetFileName = pendingDecryptName
+                    decryptPassword = ""
+                    pendingDecryptId = nil
+                    showContentSheet = true
+                }
+                Button("取消", role: .cancel) {
+                    pendingDecryptId = nil
+                    decryptPassword = ""
+                }
+            } message: {
+                Text("与加密时相同")
             }
             .onAppear {
                 let p = vaultRoot.appendingPathComponent("index.json")
