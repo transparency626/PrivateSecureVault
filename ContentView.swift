@@ -159,7 +159,7 @@ struct ContentView: View {
                     let salt = blob.prefix(16)
                     let key = SymmetricKey(data: Data(SHA256.hash(data: Data(decryptPassword.utf8) + Data(salt))))
                     guard let box = try? AES.GCM.SealedBox(combined: Data(blob.dropFirst(16))),
-                          let plain = try? AES.GCM.open(box, using: key) else { return }
+                    let plain = try? AES.GCM.open(box, using: key) else { return }
                     sheetBytes = plain
                     sheetFileName = pendingDecryptName
                     decryptPassword = ""
